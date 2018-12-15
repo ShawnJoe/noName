@@ -1,17 +1,18 @@
+var phoneWidth = parseInt(window.screen.width);
+var phoneScale = phoneWidth/640;
+var ua = navigator.userAgent;
+if (/Android (\d+\.\d+)/.test(ua)){
+    var version = parseFloat(RegExp.$1);
+    if(version>2.3){
+        document.write('<meta name="viewport" content="width=640, minimum-scale = ‘+phoneScale+‘, maximum-scale = ‘+phoneScale+‘, target-densitydpi=device-dpi">');
+    }else{
+        document.write('<meta name="viewport" content="width=640, target-densitydpi=device-dpi">');
+    }
+} else {
+    document.write('<meta name="viewport" content="width=640, user-scalable=no, target-densitydpi=device-dpi">');
+}
 $(document).ready(function(){
-	 var phoneWidth = parseInt(window.screen.width);
-	    var phoneScale = phoneWidth/640;
-	    var ua = navigator.userAgent;
-	    if (/Android (\d+\.\d+)/.test(ua)){
-	        var version = parseFloat(RegExp.$1);
-	        if(version>2.3){
-	            document.write('<meta name="viewport" content="width=640, minimum-scale = ‘+phoneScale+‘, maximum-scale = ‘+phoneScale+‘, target-densitydpi=device-dpi">');
-	        }else{
-	            document.write('<meta name="viewport" content="width=640, target-densitydpi=device-dpi">');
-	        }
-	    } else {
-	        document.write('<meta name="viewport" content="width=640, user-scalable=no, target-densitydpi=device-dpi">');
-	    }
+	
 });
 //     changeCaptcha();
 function changeCaptcha() {
@@ -33,7 +34,6 @@ function checkPhone(){
             $("#regist-right").height(hgt+30);
             v++;
         }
-
         flag2 =  false;
     }
     if(!(/^1[3|4|5|8|7][0-9]\d{8}$/.test(phone))){
@@ -49,7 +49,7 @@ function checkPhone(){
     }else{
         $.ajax({
             type:'post',
-            url:'/checkPhone',
+            url:'/dreamland/register/checkPhone',
             data: {"phone":phone},
             dataType:'json',
             success:function(data){

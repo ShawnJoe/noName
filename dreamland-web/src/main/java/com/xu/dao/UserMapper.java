@@ -23,4 +23,6 @@ public interface UserMapper extends Mapper<User>{
 
     @Override
     int updateByPrimaryKey(User record);
+    
+    
 }

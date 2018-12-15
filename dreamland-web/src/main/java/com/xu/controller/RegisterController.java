@@ -6,19 +6,33 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.xu.entity.User;
+import com.xu.service.UserService;
 
 @RestController
 @RequestMapping("/register")
 public class RegisterController {
+	private final static Logger log = Logger.getLogger(RegisterController.class);
     public static final String VERCODE_KEY = "VERCODE_KEY";
+    @Autowired
+    private UserService userService;
+    
     @RequestMapping("/codeCaptcha")
     public void CodeCaptcha(HttpSession session,HttpServletResponse response) {
         //        session.removeAttribute(LOGIN_VERCODE_KEY);
@@ -71,6 +85,22 @@ public class RegisterController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //        return "bbb";
+    }
+    
+    @RequestMapping("/checkPhone")
+    @ResponseBody
+    public Map<String, Object> checkPhone(Model model, @RequestParam(value = "phone", required = false) String phone) {
+        log.debug("注册-判断手机号" + phone + "是否可用");
+        Map map = new HashMap<String, Object>();
+        User user = userService.findByPhone(phone);
+        if (user == null) {
+            //未注册
+            map.put("message", "success");
+        } else {
+            //已注册
+            map.put("message", "fail");
+        }
+
+        return map;
     }
 }
