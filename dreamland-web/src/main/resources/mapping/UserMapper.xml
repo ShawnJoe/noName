@@ -14,16 +14,16 @@
   <sql id="Base_Column_List" >
     id, email, password, phone, nick_name, state, img_url, enable
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select 
-    <include refid="Base_Column_List" />
-    from user
-    where id = #{id,jdbcType=BIGINT}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
-    delete from user
-    where id = #{id,jdbcType=BIGINT}
-  </delete>
+<!--   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" > -->
+<!--     select  -->
+<!--     <include refid="Base_Column_List" /> -->
+<!--     from user -->
+<!--     where id = #{id,jdbcType=BIGINT} -->
+<!--   </select> -->
+<!--   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" > -->
+<!--     delete from user -->
+<!--     where id = #{id,jdbcType=BIGINT} -->
+<!--   </delete> -->
   <insert id="insert" parameterType="com.xu.entity.User" >
     insert into user (id, email, password, 
       phone, nick_name, state, 
@@ -125,42 +125,32 @@
       enable = #{enable,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.xu.entity.User" >
-    update user
-    set email = #{email,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR},
-      phone = #{phone,jdbcType=VARCHAR},
-      nick_name = #{nickName,jdbcType=VARCHAR},
-      state = #{state,jdbcType=VARCHAR},
-      img_url = #{imgUrl,jdbcType=VARCHAR},
-      enable = #{enable,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="selectOne" parameterType="com.xu.entity.User" >
-    select 
-    <include refid="Base_Column_List" />
-    from user
-    where 
-    <if test="id != null" >
-    	id = #{id,jdbcType=BIGINT}
-    </if>
-    <if test="email != null" >
-    	email = #{email,jdbcType=BIGINT}
-    </if>
-    <if test="password != null" >
-    	password = #{password,jdbcType=BIGINT}
-    </if>
-    <if test="nickName != null" >
-    	nick_name = #{nickName,jdbcType=BIGINT}
-    </if>
-    <if test="state != null" >
-    	state = #{state,jdbcType=BIGINT}
-    </if>
-    <if test="imgUrl != null" >
-    	img_url = #{imgUrl,jdbcType=BIGINT}
-    </if>
-    <if test="enable != null" >
-    	enable = #{enable,jdbcType=BIGINT}
-    </if>
-  </update>
+<!--   <select id="selectOne" parameterType="com.xu.entity.User" > -->
+<!--     select  -->
+<!--     <include refid="Base_Column_List" /> -->
+<!--     from user -->
+<!--     <where>  -->
+<!-- 	    <if test="id != null" > -->
+<!-- 	    	id = #{id,jdbcType=BIGINT} -->
+<!-- 	    </if> -->
+<!-- 	    <if test="email != null" > -->
+<!-- 	    	email = #{email,jdbcType=BIGINT} -->
+<!-- 	    </if> -->
+<!-- 	    <if test="password != null" > -->
+<!-- 	    	password = #{password,jdbcType=BIGINT} -->
+<!-- 	    </if> -->
+<!-- 	    <if test="nickName != null" > -->
+<!-- 	    	nick_name = #{nickName,jdbcType=BIGINT} -->
+<!-- 	    </if> -->
+<!-- 	    <if test="state != null" > -->
+<!-- 	    	state = #{state,jdbcType=BIGINT} -->
+<!-- 	    </if> -->
+<!-- 	    <if test="imgUrl != null" > -->
+<!-- 	    	img_url = #{imgUrl,jdbcType=BIGINT} -->
+<!-- 	    </if> -->
+<!-- 	    <if test="enable != null" > -->
+<!-- 	    	enable = #{enable,jdbcType=BIGINT} -->
+<!-- 	    </if> -->
+<!--     </where> -->
+<!--   </select> -->
 </mapper>

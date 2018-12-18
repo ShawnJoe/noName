@@ -5,8 +5,9 @@ import org.springframework.stereotype.Repository;
 import com.xu.entity.User;
 
 import tk.mybatis.mapper.common.Mapper;
+import tk.mybatis.spring.annotation.MapperScan;
 
-//@Mapper
+@MapperScan
 @Repository
 public interface UserMapper extends Mapper<User>{
 
