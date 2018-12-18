@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Implementation-Title: dreamland-web Maven Webapp
-Implementation-Version: 1.00.00
-Built-By: ZhaoXu
-Implementation-Vendor-Id: com.xu
-Build-Jdk: 1.8.0_121
-Implementation-URL: http://maven.apache.org
-Created-By: Maven Integration for Eclipse
-
