@@ -14,6 +14,20 @@ if (/Android (\d+\.\d+)/.test(ua)){
 $(document).ready(function(){
 	
 });
+$("#to_register").click (function(){
+    if(!checkProtocol()){
+        $("#protocol_span").text("请勾选\"阅读并接受梦境网用户协议\"！").css("color","red");
+    }else{
+        $("#protocol_span").text("");
+    }
+
+    if(checkPhone()  &&  checkPassword()&& checkEmail() && checkNickName()&& checkCode() && checkProtocol()){
+        $("#registerForm").submit();
+    }else {
+        $("#reg_span").text("请将信息填写完整！").css("color","red");
+    }
+
+});
 //     changeCaptcha();
 function changeCaptcha() {
 	//增加当前时间参数，此参数没有实际意义，只是为了更新链接，再次访问
@@ -89,8 +103,47 @@ function checkPhone(){
 
     return flag2;
 }
+var flag_c = false;
+function checkCode() {
+    var code = $("#code").val();
+    code = code.replace(/^\s+|\s+$/g,"");
+    if(code == ""){
+        $("#code_span").text("请输入验证码！").css("color","red");
+        flag_c = false;
+    }else{
+        $.ajax({
+            type: 'post',
+            url: '/dreamland/register/checkCode',
+            data: {"code": code},
+            dataType: 'json',
+            success: function (data) {
+                var val = data['message'];
+                if (val == "success") {
+                    $("#code_span").text("√").css("color","green");
+                    $("#reg_span").text("");
+                    flag_c = true;
+                }else {
+                    $("#code_span").text("验证码错误！").css("color","red");
+                    flag_c = false;
+                }
+            }
+        });
 
+    }
+    return flag_c;
+}
+//勾选用户协议校验
+function checkProtocol() {
+    if($('#protocol').prop("checked"))
+    {
+        $("#reg_span").text("");
+        return true;
+    }
+    else{
+        return false;
+    }
 
+}
  //根据内容增加而增加高度
 function increaseHeight() {
 
