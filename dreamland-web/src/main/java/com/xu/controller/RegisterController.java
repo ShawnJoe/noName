@@ -9,13 +9,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +28,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.xu.common.CodeCaptchaServlet;
+import com.xu.common.MD5Util;
 import com.xu.entity.User;
+import com.xu.mail.SendEmail;
 import com.xu.service.UserService;
 
 @RestController
@@ -35,7 +40,8 @@ public class RegisterController {
     public static final String VERCODE_KEY = "VERCODE_KEY";
     @Autowired
     private UserService userService;
-    
+    @Autowired// redis数据库操作模板
+    private RedisTemplate<String, String> redisTemplate;
     @RequestMapping("/codeCaptcha")
     public void CodeCaptcha(HttpSession session,HttpServletResponse response) {
         //        session.removeAttribute(LOGIN_VERCODE_KEY);
@@ -124,5 +130,70 @@ public class RegisterController {
         }
 
         return map;
+    }
+    
+    @RequestMapping("/doRegister")
+    public String doRegister(Model model, @RequestParam(value = "email", required = false) String email,
+                             @RequestParam(value = "password", required = false) String password,
+                             @RequestParam(value = "phone", required = false) String phone,
+                             @RequestParam(value = "nickName", required = false) String nickname,
+                             @RequestParam(value = "code", required = false) String code) {
+
+        log.debug("注册...");
+        if (StringUtils.isBlank(code)) {
+            model.addAttribute("error", "非法注册，请重新注册！");
+            return "../register";
+        }
+
+        int b = checkValidateCode(code);
+        if (b == -1) {
+            model.addAttribute("error", "验证码超时，请重新注册！");
+            return "../register";
+        } else if (b == 0) {
+            model.addAttribute("error", "验证码不正确,请重新输入!");
+            return "../register";
+        }
+
+
+        User user = userService.findByEmail(email);
+        if (user != null) {
+            model.addAttribute("error", "该用户已经被注册！");
+            return "../register";
+        } else {
+            user = new User();
+            user.setNickName(nickname);
+
+            user.setPassword(MD5Util.encodeToHex("salt"+password));
+            user.setPhone(phone);
+            user.setEmail(email);
+            user.setState("0");
+            user.setEnable("0");
+            user.setImgUrl("/images/icon_m.jpg");
+            //邮件激活码
+            String validateCode = MD5Util.encodeToHex("salt"+email + password);
+            redisTemplate.opsForValue().set(email, validateCode, 24, TimeUnit.HOURS);// 24小时 有效激活 redis保存激活码
+
+            userService.regist(user);
+
+            log.info("注册成功");
+            SendEmail.sendEmailMessage(email, validateCode);
+            String message = email + "," + validateCode;
+            model.addAttribute("message", message);
+            return "/regist/registerSuccess";
+
+        }
+    }
+        // 匹对验证码的正确性
+
+    public int checkValidateCode(String code) {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        Object vercode = attrs.getRequest().getSession().getAttribute("VERCODE_KEY");
+        if (null == vercode) {
+            return -1;
+        }
+        if (!code.equalsIgnoreCase(vercode.toString())) {
+            return 0;
+        }
+        return 1;
     }
 }
