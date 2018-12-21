@@ -12,9 +12,19 @@ if (/Android (\d+\.\d+)/.test(ua)){
     document.write('<meta name="viewport" content="width=640, user-scalable=no, target-densitydpi=device-dpi">');
 }
 $(document).ready(function(){
-	
+	$('#hidden_frame').load(function(){
+	    var text=$(this).contents().find("body").text();
+	       // 根据后台返回值处理结果
+	    var j=$.parseJSON(text);
+	    if(j!=0) {
+	        alert(j.msg);
+	    } else {
+	        alert('注册成功');
+	        //location.href='BookResourceList.jsp'
+	    }
+	})
 });
-$("#to_register").click (function(){
+function register(){
     if(!checkProtocol()){
         $("#protocol_span").text("请勾选\"阅读并接受梦境网用户协议\"！").css("color","red");
     }else{
@@ -27,7 +37,8 @@ $("#to_register").click (function(){
         $("#reg_span").text("请将信息填写完整！").css("color","red");
     }
 
-});
+}
+
 //     changeCaptcha();
 function changeCaptcha() {
 	//增加当前时间参数，此参数没有实际意义，只是为了更新链接，再次访问
@@ -158,6 +169,165 @@ function reduceHeight() {
     $("#regist-left").height(hgt-30);
     $("#regist-right").height(hgt-30);
 }
+//校验密码强弱
+var flag = false;
+var i = 0;
+var c = 0;
+function CheckIntensity(pwd) {
+    var val = $("#password_span").text();
+    if(c==0 && (val==null || val =="")){
+        increaseHeight();
+        c++;
+    }
+    //去两边空格
+    if(pwd!=null) {
+        pwd = pwd.replace(/^\s+|\s+$/g, "");
+    }
+    var len = 0;
+    if(pwd != "" && pwd!=null){
+        len = pwd.length;
+    }
+    if( len < 6){
+        $("#password_span").text("密码长度少于6位，请重新输入！").css("color","red");
+    }else {
+        if(/^[0-9]*$/.test(pwd) || /^[A-Za-z]+$/.test(pwd)){
+
+            $("#password_span").text("密码强度弱！").css("color","red");
+        }else if(/^[A-Za-z0-9]+$ /.test(pwd) || pwd.length <= 10){
+
+            $("#password_span").text("密码强度中！").css("color","#FF6100");
+        }else{
+
+            $("#password_span").text("密码强度强！").css("color","green");
+
+        }
+        flag = true;
+
+
+    }
+    return flag;
+}
+
+//密码框离焦事件
+var cp = 0;
+function checkPassword() {
+    var password = $("#password").val();
+    password = password.replace(/^\s+|\s+$/g,"");
+    if(password == ""){
+        $("#password_span").text("请输入密码！").css("color","red");
+        if(cp==0){
+            increaseHeight();
+            cp++;
+        }
+        return false;
+    }
+    if(password.length < 6){
+        $("#password_span").text("密码长度少于6位，请重新输入！").css("color","red");
+        if(cp==0){
+            cp++;
+            increaseHeight();
+        }
+        return false;
+    }
+
+
+    if(flag){
+        $("#password_span").text("");
+        $("#reg_span").text("");
+
+        if(cp==1){
+            reduceHeight();
+            cp=0;
+        }
+        return true;
+    }
+}
+
+
+
+
+//邮箱校验
+var e = 0;
+var flag_e =false;
+function checkEmail() {
+    var email = $("#email").val();
+    email = email.replace(/^\s+|\s+$/g,"");
+    if(email == "" || email==null){
+        if(e==0){
+            increaseHeight();
+            e++;
+        }
+        $("#email_span").text("请输入邮箱账号！");
+        $("#email_ok").text("");
+         flag_e = false;
+    }
+    if(!(/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+$/.test(email))){
+        $("#email_span").text("邮箱账号不存在，请重新输入！");
+        $("#email_ok").text("");
+        if(e==0){
+            increaseHeight();
+            e++;
+        }
+         flag_e = false;
+    }else{
+        //验证邮箱是否已经注册
+        $.ajax({
+            type:'post',
+            url:'/dreamland/register/checkEmail',
+            data: {"email":email},
+            dataType:'json',
+            success:function(data) {
+                var val = data['message'];
+                if(val=="success"){
+                    $("#email_span").text("");
+                    $("#reg_span").text("");
+                    $("#email_ok").text("√").css("color","green");
+
+                    var content = $("#email_ok").text();
+                    if(content=="√" ){
+                        var hgt = $("#regist-left").height();
+                        if(v==1){
+                            $("#regist-left").height(hgt-30);
+                            $("#regist-right").height(hgt-30);
+                        }
+                        v=0;
+                    }
+                    flag_e = true;
+
+                }else{
+
+                    $("#email_span").text("该Email已经注册！");
+                    $("#email_ok").text("");
+                    var hgt = $("#regist-left").height();
+                    if(v==0){
+                        $("#regist-left").height(hgt+30);
+                        $("#regist-right").height(hgt+30);
+                        v++;
+                    }
+                    flag_e =  false;
+                }
+            }
+       });
+
+    }
+    return flag_e;
+}
+
+//昵称校验
+function checkNickName() {
+    var nickName = $("#nickName").val();
+    nickName = nickName.replace(/^\s+|\s+$/g,"");
+    if(nickName == ""){
+        $("#nickName_span").text("请输入昵称！");
+        return false;
+    }else{
+        $("#nickName_span").text("");
+        $("#reg_span").text("");
+        return true;
+    }
+};
+
+
 // 	$.ajax({
 //      type:"GET",
 //      url:"http://localhost:8080/dreamland/register/codeCaptcha",

@@ -16,7 +16,7 @@ public class SendEmail {
     private final static Logger log = Logger.getLogger( SendEmail.class);
     public static void sendEmailMessage(String email,String validateCode) {
        try {
-           String host = "smtp.163.com";   //发件人使用发邮件的电子信箱服务器
+           String host = "smtp.qq.com";   //发件人使用发邮件的电子信箱服务器
            String from = "发件人邮箱";    //发邮件的出发地（发件人的信箱）
            String to = email;   //发邮件的目的地（收件人信箱）
            // Get system properties
@@ -56,7 +56,7 @@ public class SendEmail {
            log.info( "send validateCode to " + email );
        }catch (Exception e){
 
-           log.info( "Send Email Exception:"+e.getMessage() );
+           log.info( "Send Email Exception:"+e );
        }
 
     }

@@ -19,7 +19,7 @@
         <div class="zc">
             <div class="bj_bai" style="height: 408px">
             <h3>欢迎注册</h3>
-              <form action="/dreamland/register/registe" method="post" id="registerForm">
+              <form action="/dreamland/register/doRegister" method="post" id="registerForm" target="hidden_frame">
                   <span id="reg_span"></span>
                 <input id="phone" name="phone" type="text" class="kuang_txt phone" placeholder="手机号" onblur="checkPhone();">
                 <span id="phone_ok"></span>
@@ -47,7 +47,7 @@
                     <br/>
                     <span id="protocol_span"></span>
                 </div>
-                <input name="注册" type="button" class="btn_zhuce" id ="to_register" value="注册">
+                <input name="注册" type="button" class="btn_zhuce" id ="to_register" value="注册" onclick="register()">
                   <br/>
                   <span style="color: red"></span>
                 
@@ -63,6 +63,7 @@
             </div>
         </div>
     </div>
+    <iframe name='hidden_frame' id="hidden_frame" style='display: none'></iframe>
 </div>
     
 <div style="text-align:center;">

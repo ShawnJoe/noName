@@ -29,6 +29,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.xu.common.CodeCaptchaServlet;
 import com.xu.common.MD5Util;
+import com.xu.constant.RegisterCode;
 import com.xu.entity.User;
 import com.xu.mail.SendEmail;
 import com.xu.service.UserService;
@@ -131,7 +132,23 @@ public class RegisterController {
 
         return map;
     }
-    
+
+    @RequestMapping("/checkEmail")
+    @ResponseBody
+    public Map<String, Object> checkEmail(Model model, @RequestParam(value = "email", required = false) String email) {
+        log.debug("注册-判断邮箱" + email + "是否可用");
+        Map map = new HashMap<String, Object>();
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            //未注册
+            map.put("message", "success");
+        } else {
+            //已注册
+            map.put("message", "fail");
+        }
+
+        return map;
+    }
     @RequestMapping("/doRegister")
     public String doRegister(Model model, @RequestParam(value = "email", required = false) String email,
                              @RequestParam(value = "password", required = false) String password,
@@ -142,23 +159,23 @@ public class RegisterController {
         log.debug("注册...");
         if (StringUtils.isBlank(code)) {
             model.addAttribute("error", "非法注册，请重新注册！");
-            return "../register";
+            return RegisterCode.REGIST_ILLGEL.getCode();
         }
 
         int b = checkValidateCode(code);
         if (b == -1) {
             model.addAttribute("error", "验证码超时，请重新注册！");
-            return "../register";
+            return RegisterCode.REGISTE_TIMEOUT.getCode();
         } else if (b == 0) {
             model.addAttribute("error", "验证码不正确,请重新输入!");
-            return "../register";
+            return RegisterCode.REGIST_ERROR.getCode();
         }
 
 
         User user = userService.findByEmail(email);
         if (user != null) {
             model.addAttribute("error", "该用户已经被注册！");
-            return "../register";
+            return RegisterCode.REGISTED.getCode();
         } else {
             user = new User();
             user.setNickName(nickname);
@@ -179,7 +196,7 @@ public class RegisterController {
             SendEmail.sendEmailMessage(email, validateCode);
             String message = email + "," + validateCode;
             model.addAttribute("message", message);
-            return "/regist/registerSuccess";
+            return RegisterCode.REGIST_SUCCESS.getCode();
 
         }
     }
@@ -196,4 +213,66 @@ public class RegisterController {
         }
         return 1;
     }
+    @RequestMapping("/activecode")
+    public String active(Model model) {
+        log.info( "==============激活验证==================" );
+        //判断   激活有无过期 是否正确
+        //validateCode=
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        String validateCode = attrs.getRequest().getParameter( "validateCode" );
+        String email = attrs.getRequest().getParameter( "email" );
+        String code = redisTemplate.opsForValue().get( email );
+        log.info( "验证邮箱为："+email+",邮箱激活码为："+code+",用户链接的激活码为："+validateCode );
+        //判断是否已激活
+
+        User userTrue = userService.findByEmail( email );
+        if(userTrue!=null && "1".equals( userTrue.getState() )){
+            //已激活
+            model.addAttribute( "success","您已激活,请直接登录！" );
+            return "../login";
+        }
+
+        if(code==null){
+            //激活码过期
+            model.addAttribute( "fail","您的激活码已过期,请重新注册！" );
+            userService.deleteByEmail( email );
+            return "/regist/activeFail";
+        }
+
+        if(StringUtils.isNotBlank( validateCode ) && validateCode.equals( code )){
+            //激活码正确
+            userTrue.setEnable( "1" );
+            userTrue.setState( "1" );
+            userService.update( userTrue );
+            model.addAttribute( "email",email );
+            return "/regist/activeSuccess";
+        }else {
+            //激活码错误
+            model.addAttribute( "fail","您的激活码错误,请重新激活！" );
+            return "/regist/activeFail";
+        }
+
+    }
+
+
+
+    @RequestMapping("/sendEmail")
+    @ResponseBody
+    public  Map<String,Object> sendEmail(Model model) {
+        Map map = new HashMap<String,Object>(  );
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        String validateCode = attrs.getRequest().getParameter( "validateCode" );
+        String email = attrs.getRequest().getParameter( "email" );
+        SendEmail.sendEmailMessage(email,validateCode);
+        map.put( "success","success" );
+        return map;
+    }
+
+//    @RequestMapping("/register")
+//    public String register(Model model) {
+//
+//        log.info("进入注册页面");
+//
+//        return "../register";
+//    }
 }
