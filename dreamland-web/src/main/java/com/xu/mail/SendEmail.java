@@ -16,8 +16,8 @@ public class SendEmail {
     private final static Logger log = Logger.getLogger( SendEmail.class);
     public static void sendEmailMessage(String email,String validateCode) {
        try {
-           String host = "smtp.qq.com";   //发件人使用发邮件的电子信箱服务器
-           String from = "发件人邮箱";    //发邮件的出发地（发件人的信箱）
+           String host = "smtp.163.com";   //发件人使用发邮件的电子信箱服务器
+           String from = "shawnXuJoe@163.com";    //发邮件的出发地（发件人的信箱）
            String to = email;   //发邮件的目的地（收件人信箱）
            // Get system properties
            Properties props = System.getProperties();
@@ -28,7 +28,7 @@ public class SendEmail {
            // Get session
            props.put("mail.smtp.auth", "true"); //这样才能通过验证
 
-           MyAuthenticator myauth = new MyAuthenticator(from, "你的授权码");
+           MyAuthenticator myauth = new MyAuthenticator(from, "zhaoxu123");
            Session session = Session.getDefaultInstance(props, myauth);
 
 //    session.setDebug(true);

@@ -19,8 +19,8 @@ $(document).ready(function(){
 	    if(j!=0) {
 	        alert(j.msg);
 	    } else {
-	        alert('注册成功');
-	        //location.href='BookResourceList.jsp'
+	        alert($("#email").val());
+	        location.href="./registerSuccess.html?email="+ $("#email").val()
 	    }
 	})
 });
