@@ -51,5 +51,3 @@ mybatis:
   mapper-locations: classpath:mapping/*.xml
   mybatis.type-aliases-package: com.xu
 #  mybatis.mapper-locations=classpath*:mapper/*Mapper.xml
-
-  

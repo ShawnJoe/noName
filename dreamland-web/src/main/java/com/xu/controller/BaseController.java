@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.github.pagehelper.Page;
+import com.xu.common.PageHelper.Page;
 import com.xu.entity.Comment;
 import com.xu.entity.User;
 import com.xu.entity.UserContent;
