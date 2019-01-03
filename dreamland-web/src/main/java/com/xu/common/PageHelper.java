@@ -11,6 +11,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.sql.*;
@@ -20,9 +21,11 @@ import java.util.Properties;
 /**
  * Mybatis+Mysql 分页工具类
  */
+@Component
 @Intercepts({
 		@Signature(type = StatementHandler.class, method = "prepare", args = {
-				Connection.class}),
+				Connection.class,Integer.class}), 
+		//高版本mybatis 需要加一个Integer.class
 		@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {
 				Statement.class})})
 public class PageHelper implements Interceptor {
@@ -52,7 +55,7 @@ public class PageHelper implements Interceptor {
 		return page;
 	}
 
-	@Override
+	//@Override
 	public Object intercept(Invocation invocation) throws Throwable {
 		if (localPage.get() == null) {
 			return invocation.proceed();
@@ -119,7 +122,7 @@ public class PageHelper implements Interceptor {
 	 * @param target
 	 * @return
 	 */
-	@Override
+	//@Override
 	public Object plugin(Object target) {
 		if (target instanceof StatementHandler
 				|| target instanceof ResultSetHandler) {
@@ -129,7 +132,7 @@ public class PageHelper implements Interceptor {
 		}
 	}
 
-	@Override
+	//@Override
 	public void setProperties(Properties properties) {
 
 	}
